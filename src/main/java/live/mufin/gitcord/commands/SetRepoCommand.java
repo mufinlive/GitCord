@@ -4,6 +4,7 @@ import dev.morphia.query.experimental.filters.Filters;
 import live.mufin.gitcord.Gitcord;
 import live.mufin.gitcord.entities.Server;
 import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.jetbrains.annotations.NotNull;
@@ -21,6 +22,8 @@ public class SetRepoCommand extends ListenerAdapter {
   @Override
   public void onSlashCommandInteraction(@NotNull SlashCommandInteractionEvent event) {
     if (!event.getName().equals("setrepo")) return;
+    if(!event.getMember().hasPermission(Permission.ADMINISTRATOR)) return;
+
     String repo = event.getOption("repo").getAsString();
 
     this.gitcord.getDatabase().createQuery(Server.class)

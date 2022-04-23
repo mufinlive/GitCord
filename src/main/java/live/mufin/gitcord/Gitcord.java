@@ -10,6 +10,7 @@ import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.OnlineStatus;
 import net.dv8tion.jda.api.entities.Activity;
+import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import org.kohsuke.github.GitHub;
@@ -47,7 +48,7 @@ public class Gitcord {
     }
 
     this.jda = JDABuilder.createDefault(this.config.getProperty("TOKEN"))
-       .setActivity(Activity.watching("Your GitHub repositories"))
+       .setActivity(Activity.watching("Your GitHub repositories | v1.2"))
        .setStatus(OnlineStatus.DO_NOT_DISTURB)
        .build();
 
@@ -60,6 +61,12 @@ public class Gitcord {
     this.jda.addEventListener(new SetRepoCommand(this));
 
     this.registerCommands();
+
+    this.logger.info("Currently in {} guilds with {} total members.", this.jda.getGuilds().size(), this.getMemberCount());
+  }
+
+  private int getMemberCount() {
+    return this.jda.getGuilds().stream().mapToInt(Guild::getMemberCount).sum();
   }
 
   private void registerCommands() {
