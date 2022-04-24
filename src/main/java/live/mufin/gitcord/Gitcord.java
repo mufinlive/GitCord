@@ -48,7 +48,7 @@ public class Gitcord {
     }
 
     this.jda = JDABuilder.createDefault(this.config.getProperty("TOKEN"))
-       .setActivity(Activity.watching("Your GitHub repositories | v1.2"))
+       .setActivity(Activity.watching("Your GitHub repositories | v1.3"))
        .setStatus(OnlineStatus.DO_NOT_DISTURB)
        .build();
 

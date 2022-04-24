@@ -8,6 +8,7 @@ import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.jetbrains.annotations.NotNull;
+import org.kohsuke.github.GHFileNotFoundException;
 
 import java.io.IOException;
 
@@ -32,22 +33,38 @@ public class SetRepoCommand extends ListenerAdapter {
        .findAny()
        .ifPresent(server -> {
 
-         try {
-           if (this.gitcord.getGithub().getRepository(repo) == null) {
-             return;
+           try {
+             this.gitcord.getGithub().getRepository(repo);
+
+             server.setRepository(repo);
+             this.gitcord.getDatabase().save(server);
+             event.replyEmbeds(
+                new EmbedBuilder()
+                   .setColor(0x8854d0)
+                   .setTitle(String.format("Successfully set repository to `%s`.", repo))
+                   .build()
+             ).queue();
+
+           } catch (GHFileNotFoundException e) {
+             event.getInteraction().replyEmbeds(
+                new EmbedBuilder()
+                   .setTitle("Repository not found.")
+                   .setDescription(String.format("Could not find repository `%s`. Perhaps you made a typo or the repo is private?", repo))
+                   .setColor(0xeb3b5a)
+                   .build()
+             ).setEphemeral(true).queue();
+           } catch (IllegalArgumentException e) {
+             event.getInteraction().replyEmbeds(
+                new EmbedBuilder()
+                   .setTitle("Something went wrong:")
+                   .setDescription(String.format("`%s`", e.getMessage()))
+                   .setColor(0xeb3b5a)
+                   .build()
+             ).setEphemeral(true).queue();
+           } catch (IOException e) {
+             event.getInteraction().reply("Something went wrong.").setEphemeral(true).queue();
            }
 
-           server.setRepository(repo);
-           this.gitcord.getDatabase().save(server);
-           event.replyEmbeds(
-              new EmbedBuilder()
-                 .setColor(0x8854d0)
-                 .setTitle(String.format("Successfully set repository to `%s`.", repo))
-                 .build()
-           ).queue();
-         } catch (IOException e) {
-           e.printStackTrace();
-         }
 
        });
   }
